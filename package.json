@@ -1,7 +1,7 @@
 {
   "name": "ember-cli-gisty",
   "version": "0.0.0",
-  "description": "Ember CLI addon for rendering Git Gists in templates",
+  "description": "Ember CLI addon for rendering GitHub Gists in templates",
   "keywords": [
     "ember-addon",
     "gisty",
