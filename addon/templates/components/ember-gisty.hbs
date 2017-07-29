@@ -2,4 +2,4 @@
 {{#if gistStylesheet}}
   <link rel="stylesheet" type="text/css" href="{{gistStylesheet}}">
 {{/if}}
-{{yield}}
+{{yield (hash error=error isLoading=isLoading fetch=(action 'fetch'))}}
