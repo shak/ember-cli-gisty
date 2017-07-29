@@ -154,3 +154,30 @@ test('it yields error when response does not have the div property', function(as
     1
   );
 });
+
+test('it renders the markup when returned successfully', function(assert) {
+  assert.expect(1);
+
+  const gist = '1234567789';
+  const user = 'shahrukhomar';
+
+  this.set('gistFetchService.request', () => {
+    return new RSVP.Promise((resolve) => { resolve({ div: '<div id="success">Success</div>' }); });
+  });
+
+  this.set('gist', gist);
+  this.set('user', user);
+
+  this.render(hbs`{{ember-gisty user=user gist=gist}}`);
+
+  return wait()
+    .then(
+      () => {
+        assert.equal(
+          this.$('#success').length,
+          1
+        );
+      }
+    )
+  ;
+});
