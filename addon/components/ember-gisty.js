@@ -2,20 +2,10 @@ import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { alias } from '@ember/object/computed';
 import { typeOf } from '@ember/utils';
+import { inject } from '@ember/service';
 import { getWithDefault } from '@ember/object';
 
 import layout from '../templates/components/ember-gisty';
-import jQuery from 'jquery';
-
-/**
- * @static
- * @final
- * @public
- * @property GITHUB_GIST_HOST
- * @type String
- * @default https://gist.github.com
- */
-export const GITHUB_GIST_HOST = 'https://gist.github.com';
 
 export default Component.extend({
   layout,
@@ -38,19 +28,28 @@ export default Component.extend({
   gist: null,
 
   /**
-   * Returns the fill json URL for retrieving the GIST
+   * Ajax service
    *
    * @private
-   * @property url
+   * @property gistFetch
+   * @type Ember.Service
+   */
+  gistFetch: inject(),
+
+  /**
+   * Returns the fill json gistURL for retrieving the GIST
+   *
+   * @private
+   * @property gistURL
    * @type String | Boolean
    */
-  url: computed('user', 'gist', {
+  gistURL: computed('user', 'gist', {
     get() {
       const gist = this.get('gist');
       const user = this.get('user');
 
       if (typeOf(gist) === 'string') {
-        return `${GITHUB_GIST_HOST}/${user}/${gist}.json`;
+        return `${user}/${gist}.json`;
       }
 
       return false;
@@ -93,29 +92,48 @@ export default Component.extend({
    * @method didReceiveAttrs
    */
   didReceiveAttrs() {
-    const url = this.get('url');
+    this.send('fetch');
+  },
 
-    if (url) {
-      jQuery
-        .ajax({
-          url: url,
-          dataType: 'jsonp'
-        })
-        .done(
-          (data) => {
-            // ensure gist has valid payload
-            const payloadDiv = getWithDefault(data || {}, 'div', false);
-            if (payloadDiv) {
-              this.set('payload', data);
+  actions: {
+    /**
+     * Fetches the gist from the web
+     *
+     * @method action.fetch
+     */
+    fetch() {
+      const gistURL = this.get('gistURL');
+      // reset state
+      this.setProperties({
+        error: false,
+        isLoading: true
+      });
+
+      if (gistURL) {
+        return this
+          .get('gistFetch')
+          .request(gistURL)
+          .then(
+            (response) => {
+              const payloadDiv = getWithDefault(response || {}, 'div', false);
+              if (payloadDiv) {
+                return this.set('payload', response);
+              } else {
+                this.set('error', true);
+              }
+            },
+            () => {
+              this.set('error', true);
             }
-          }
-        )
-        .fail(
-          () => {
-            this.set('error', true);
-          }
-        )
-      ;
+          )
+          .finally(
+            () => {
+              this.set('isLoading', false);
+            }
+          )
+        ;
+      }
+      this.set('error', true);
     }
   }
 });
