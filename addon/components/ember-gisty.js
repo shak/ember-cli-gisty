@@ -86,7 +86,7 @@ export default Component.extend({
   gistStylesheet: alias('payload.stylesheet'),
 
   /**
-   * Retrieves gist from Github
+   * Retrieves gist from Github on `didReceiveAttrs` event
    *
    * @protected
    * @method didReceiveAttrs

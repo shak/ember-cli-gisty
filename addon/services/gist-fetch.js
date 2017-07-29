@@ -1,5 +1,7 @@
 import AjaxService from 'ember-ajax/services/ajax';
 
+const GITHUB_GIST_HOST = 'https://gist.github.com';
+
 export default AjaxService.extend({
   /**
    * Github Gist default host
@@ -8,5 +10,5 @@ export default AjaxService.extend({
    * @type String
    * @default 'https://gist.github.com'
    */
-  host: 'https://gist.github.com'
+  host: GITHUB_GIST_HOST
 });
