@@ -14,6 +14,8 @@ moduleForComponent('ember-gisty', 'Integration | Component | ember gisty', {
 });
 
 test('it yields error as true if gist not provided', function(assert) {
+  assert.expect(1);
+
   this.render(hbs`
     {{#ember-gisty as |gisty|}}
       {{#if gisty.error}}
@@ -70,4 +72,31 @@ test('it requests gist from the correct URL when user name is provided', functio
   this.render(hbs`{{ember-gisty user=user gist=gist}}`);
 
   return wait();
+});
+
+test('it yields isLoading when request is being processed', function(assert) {
+  assert.expect(1);
+
+  const gist = '1234567789';
+  const user = 'shahrukhomar';
+
+  this.set('gistFetchService.request', () => {
+    return new RSVP.Promise(() => { }); // unresolved promise
+  });
+
+  this.set('gist', gist);
+  this.set('user', user);
+
+  this.render(hbs`
+    {{#ember-gisty user=user gist=gist as |gisty|}}
+      {{#if gisty.isLoading}}
+        <p id="isLoading">Loading state</p>
+      {{/if}}
+    {{/ember-gisty}}
+  `);
+
+  assert.equal(
+    this.$('#isLoading').length,
+    1
+  );
 });
