@@ -49,7 +49,7 @@ export default Component.extend({
       const gist = this.get('gist');
       const user = this.get('user');
 
-      if (typeOf(gist)) {
+      if (typeOf(gist) === 'string') {
         return `${GITHUB_GIST_HOST}/${user}/${gist}.json`;
       }
 
@@ -76,6 +76,15 @@ export default Component.extend({
    */
   gistMarkup: alias('payload.div'),
 
+  /**
+   * Returns the stylesheet href for the gist from the payload
+   * when available
+   *
+   * @private
+   * @property gistMarkup
+   * @type String
+   */
+  gistStylesheet: alias('payload.stylesheet'),
 
   /**
    * Retrieves gist from Github
