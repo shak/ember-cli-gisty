@@ -208,3 +208,30 @@ test('it inserts the stylesheet when set with div', function(assert) {
     )
   ;
 });
+
+test('it does not insert the stylesheet when there is no div set', function(assert) {
+  assert.expect(1);
+
+  const gist = '1234567789';
+  const user = 'shahrukhomar';
+
+  this.set('gistFetchService.request', () => {
+    return new RSVP.Promise((resolve) => { resolve({ stylesheet: 'stub' }); });
+  });
+
+  this.set('gist', gist);
+  this.set('user', user);
+
+  this.render(hbs`{{ember-gisty user=user gist=gist}}`);
+
+  return wait()
+    .then(
+      () => {
+        assert.equal(
+          this.$('link[href="stub"]').length,
+          0
+        );
+      }
+    )
+  ;
+});
