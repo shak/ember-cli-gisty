@@ -5,8 +5,6 @@ import wait from 'ember-test-helpers/wait';
 
 import RSVP from 'rsvp';
 
-const GITHUB_GIST_HOST = 'https://gist.github.com';
-
 moduleForComponent('ember-gisty', 'Integration | Component | ember gisty', {
   integration: true,
   beforeEach() {
@@ -15,7 +13,7 @@ moduleForComponent('ember-gisty', 'Integration | Component | ember gisty', {
   }
 });
 
-test('it displays error if gist not provided', function(assert) {
+test('it yields error as true if gist not provided', function(assert) {
   this.render(hbs`
     {{#ember-gisty as |gisty|}}
       {{#if gisty.error}}
@@ -47,6 +45,29 @@ test('it requests gist from the correct URL when no user name is provided', func
   this.set('gist', gist);
 
   this.render(hbs`{{ember-gisty gist=gist}}`);
+
+  return wait();
+});
+
+test('it requests gist from the correct URL when user name is provided', function(assert) {
+  assert.expect(1);
+
+  const gist = '1234567789';
+  const user = 'shahrukhomar';
+
+  this.set('gistFetchService.request', (url) => {
+    assert.equal(
+      url,
+      `${user}/${gist}.json`
+    );
+
+    return new RSVP.Promise((resolve) => { resolve(); });
+  });
+
+  this.set('gist', gist);
+  this.set('user', user);
+
+  this.render(hbs`{{ember-gisty user=user gist=gist}}`);
 
   return wait();
 });
