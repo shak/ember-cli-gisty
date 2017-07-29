@@ -1,25 +1,26 @@
 import { moduleForComponent, test } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
+import Service from '@ember/service';
 
 moduleForComponent('ember-gisty', 'Integration | Component | ember gisty', {
-  integration: true
+  integration: true,
+  beforeEach() {
+    this.register('service:gist-fetch', Service.extend());
+    this.inject.service('gist-fetch', { as: 'gistFetchService' });
+  }
 });
 
-test('it renders', function(assert) {
-
-  // Set any properties with this.set('myProperty', 'value');
-  // Handle any actions with this.on('myAction', function(val) { ... });
-
-  this.render(hbs`{{ember-gisty}}`);
-
-  assert.equal(this.$().text().trim(), '');
-
-  // Template block usage:
+test('it displays error if gist not provided', function(assert) {
   this.render(hbs`
-    {{#ember-gisty}}
-      template block text
+    {{#ember-gisty as |gisty|}}
+      {{#if gisty.error}}
+        <p id="error">There was an error loading gist</p>
+      {{/if}}
     {{/ember-gisty}}
   `);
 
-  assert.equal(this.$().text().trim(), 'template block text');
+  assert.equal(
+    this.$('#error').length,
+    1
+  );
 });
