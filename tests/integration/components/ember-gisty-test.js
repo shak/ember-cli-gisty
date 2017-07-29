@@ -117,7 +117,7 @@ test('it yields error when request fails', function(assert) {
   this.render(hbs`
     {{#ember-gisty user=user gist=gist as |gisty|}}
       {{#if gisty.error}}
-        <p id="error">errro state</p>
+        <p id="error">error state</p>
       {{/if}}
     {{/ember-gisty}}
   `);
@@ -128,3 +128,29 @@ test('it yields error when request fails', function(assert) {
   );
 });
 
+test('it yields error when response does not have the div property', function(assert) {
+  assert.expect(1);
+
+  const gist = '1234567789';
+  const user = 'shahrukhomar';
+
+  this.set('gistFetchService.request', () => {
+    return new RSVP.Promise((resolve) => { resolve({}); });
+  });
+
+  this.set('gist', gist);
+  this.set('user', user);
+
+  this.render(hbs`
+    {{#ember-gisty user=user gist=gist as |gisty|}}
+      {{#if gisty.error}}
+        <p id="error">error state</p>
+      {{/if}}
+    {{/ember-gisty}}
+  `);
+
+  assert.equal(
+    this.$('#error').length,
+    1
+  );
+});

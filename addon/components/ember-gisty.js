@@ -112,7 +112,7 @@ export default Component.extend({
       if (gistURL) {
         return this
           .get('gistFetch')
-          .request(gistURL)
+          .request(gistURL, { dataType: 'jsonp' })
           .then(
             (response) => {
               const payloadDiv = getWithDefault(response || {}, 'div', false);
