@@ -1,7 +1,7 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
+import { alias } from '@ember/object/computed';
 import { typeOf } from '@ember/utils';
-import { htmlSafe } from '@ember/string';
 import { getWithDefault } from '@ember/object';
 
 import layout from '../templates/components/ember-gisty';
@@ -58,27 +58,24 @@ export default Component.extend({
   }),
 
   /**
-   * Markup returned by Git for the requested gist
+   * payload returned by Git for the requested gist
    *
    * @private
-   * @property markup
+   * @property payload
    * @type String | null
    * @default null
    */
-  markup: null,
+  payload: null,
 
   /**
-   * Returns the html safe markup that can be rendered by the template
+   * Returns the html from the github gist payload
    *
    * @private
-   * @property html
-   * @type String.htmlSafe
+   * @property gistMarkup
+   * @type String
    */
-  html: computed('markup', {
-    get() {
-      return htmlSafe(this.get('markup.div'));
-    }
-  }),
+  gistMarkup: alias('payload.div'),
+
 
   /**
    * Retrieves gist from Github
@@ -97,10 +94,10 @@ export default Component.extend({
         })
         .done(
           (data) => {
-            // ensure gist has valid markup
-            const markupDiv = getWithDefault(data || {}, 'div', false);
-            if (markupDiv) {
-              this.set('markup', data);
+            // ensure gist has valid payload
+            const payloadDiv = getWithDefault(data || {}, 'div', false);
+            if (payloadDiv) {
+              this.set('payload', data);
             }
           }
         )
