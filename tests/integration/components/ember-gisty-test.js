@@ -8,8 +8,8 @@ import RSVP from 'rsvp';
 moduleForComponent('ember-gisty', 'Integration | Component | ember gisty', {
   integration: true,
   beforeEach() {
-    this.register('service:gist-fetch', Service.extend());
-    this.inject.service('gist-fetch', { as: 'gistFetchService' });
+    this.register('service:gist-ajax', Service.extend());
+    this.inject.service('gisty-ajax', { as: 'gistyAjaxService' });
   }
 });
 
@@ -35,7 +35,7 @@ test('it requests gist from the correct URL when no user name is provided', func
 
   const gist = '1234567789';
 
-  this.set('gistFetchService.request', (url) => {
+  this.set('gistyAjaxService.request', (url) => {
     assert.equal(
       url,
       `anonymous/${gist}.json`
@@ -57,7 +57,7 @@ test('it requests gist from the correct URL when user name is provided', functio
   const gist = '1234567789';
   const user = 'shahrukhomar';
 
-  this.set('gistFetchService.request', (url) => {
+  this.set('gistyAjaxService.request', (url) => {
     assert.equal(
       url,
       `${user}/${gist}.json`
@@ -80,7 +80,7 @@ test('it yields isLoading when request is being processed', function(assert) {
   const gist = '1234567789';
   const user = 'shahrukhomar';
 
-  this.set('gistFetchService.request', () => {
+  this.set('gistyAjaxService.request', () => {
     return new RSVP.Promise(() => { }); // unresolved promise
   });
 
@@ -107,7 +107,7 @@ test('it yields error when request fails', function(assert) {
   const gist = '1234567789';
   const user = 'shahrukhomar';
 
-  this.set('gistFetchService.request', () => {
+  this.set('gistyAjaxService.request', () => {
     return new RSVP.Promise((resolve, reject) => { reject(); });
   });
 
@@ -134,7 +134,7 @@ test('it yields error when response does not have the div property', function(as
   const gist = '1234567789';
   const user = 'shahrukhomar';
 
-  this.set('gistFetchService.request', () => {
+  this.set('gistyAjaxService.request', () => {
     return new RSVP.Promise((resolve) => { resolve({}); });
   });
 
@@ -161,7 +161,7 @@ test('it renders the markup when returned successfully', function(assert) {
   const gist = '1234567789';
   const user = 'shahrukhomar';
 
-  this.set('gistFetchService.request', () => {
+  this.set('gistyAjaxService.request', () => {
     return new RSVP.Promise((resolve) => { resolve({ div: '<div id="success">Success</div>' }); });
   });
 
@@ -188,7 +188,7 @@ test('it inserts the stylesheet when set with div', function(assert) {
   const gist = '1234567789';
   const user = 'shahrukhomar';
 
-  this.set('gistFetchService.request', () => {
+  this.set('gistyAjaxService.request', () => {
     return new RSVP.Promise((resolve) => { resolve({ div: '<div></div>', stylesheet: 'stub' }); });
   });
 
@@ -215,7 +215,7 @@ test('it does not insert the stylesheet when there is no div set', function(asse
   const gist = '1234567789';
   const user = 'shahrukhomar';
 
-  this.set('gistFetchService.request', () => {
+  this.set('gistyAjaxService.request', () => {
     return new RSVP.Promise((resolve) => { resolve({ stylesheet: 'stub' }); });
   });
 

@@ -1,6 +1,6 @@
 import { moduleFor, test } from 'ember-qunit';
 
-moduleFor('service:gist-fetch', 'Unit | Service | gist fetch');
+moduleFor('service:gisty-ajax', 'Unit | Service | gisty ajax');
 
 test('it has the host set correctly', function(assert) {
   assert.expect(1);

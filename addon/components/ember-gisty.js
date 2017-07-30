@@ -31,10 +31,10 @@ export default Component.extend({
    * Ajax service
    *
    * @private
-   * @property gistFetch
+   * @property gistyAjax
    * @type Ember.Service
    */
-  gistFetch: inject(),
+  gistyAjax: inject(),
 
   /**
    * Returns the fill json gistURL for retrieving the GIST
@@ -103,7 +103,7 @@ export default Component.extend({
 
       if (gistURL) {
         return this
-          .get('gistFetch')
+          .get('gistyAjax')
           .request(gistURL, { dataType: 'jsonp' })
           .then(
             (response) => {
