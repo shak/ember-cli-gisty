@@ -74,6 +74,29 @@ test('it requests gist from the correct URL when user name is provided', functio
   return wait();
 });
 
+test('it sets the dataType to jsonp always', function(assert) {
+  assert.expect(1);
+
+  const gist = '1234567789';
+  const user = 'shahrukhomar';
+
+  this.set('gistyAjaxService.request', (url, options) => {
+    assert.equal(
+      options.dataType,
+      'jsonp'
+    );
+
+    return new RSVP.Promise((resolve) => { resolve(); });
+  });
+
+  this.set('gist', gist);
+  this.set('user', user);
+
+  this.render(hbs`{{ember-gisty user=user gist=gist}}`);
+
+  return wait();
+});
+
 test('it yields isLoading when request is being processed', function(assert) {
   assert.expect(1);
 
