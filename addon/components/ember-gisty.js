@@ -1,9 +1,9 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
-import { alias } from '@ember/object/computed';
 import { typeOf } from '@ember/utils';
 import { inject } from '@ember/service';
 import { getWithDefault } from '@ember/object';
+import jQuery from 'jquery';
 
 import layout from '../templates/components/ember-gisty';
 
@@ -57,35 +57,6 @@ export default Component.extend({
   }),
 
   /**
-   * payload returned by Git for the requested gist
-   *
-   * @private
-   * @property payload
-   * @type String | null
-   * @default null
-   */
-  payload: null,
-
-  /**
-   * Returns the html from the github gist payload
-   *
-   * @private
-   * @property gistMarkup
-   * @type String
-   */
-  gistMarkup: alias('payload.div'),
-
-  /**
-   * Returns the stylesheet href for the gist from the payload
-   * when available
-   *
-   * @private
-   * @property gistMarkup
-   * @type String
-   */
-  gistStylesheet: alias('payload.stylesheet'),
-
-  /**
    * Retrieves gist from Github on `didReceiveAttrs` event
    *
    * @protected
@@ -93,6 +64,27 @@ export default Component.extend({
    */
   didReceiveAttrs() {
     this.send('fetch');
+  },
+
+  /**
+   * Appends markup to the component
+   *
+   * @private
+   * @method processMarkup
+   *
+   * @return Boolean
+   */
+  processMarkup(response) {
+    const responseDiv = getWithDefault(response || {}, 'div', false);
+
+    if (responseDiv) {
+      const $responceDiv = jQuery(responseDiv);
+      this.$().append($responceDiv);
+
+      return true;
+    }
+
+    this.set('error', true);
   },
 
   actions: {
@@ -115,11 +107,8 @@ export default Component.extend({
           .request(gistURL, { dataType: 'jsonp' })
           .then(
             (response) => {
-              const payloadDiv = getWithDefault(response || {}, 'div', false);
-              if (payloadDiv) {
-                return this.set('payload', response);
-              } else {
-                this.set('error', true);
+              if (this.processMarkup(response)) {
+                // rpocess stylesheet
               }
             },
             () => {
