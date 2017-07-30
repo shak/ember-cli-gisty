@@ -87,13 +87,15 @@ export default Component.extend({
     const responseDiv = getWithDefault(response || {}, 'div', false);
 
     if (responseDiv) {
-      const $responceDiv = jQuery(responseDiv);
-      this.$().append($responceDiv);
+      const $responseDiv = jQuery(responseDiv);
+      this.$().append($responseDiv);
 
       return true;
     }
 
     this.set('error', true);
+
+    return false;
   },
 
   actions: {
