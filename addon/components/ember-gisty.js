@@ -28,6 +28,15 @@ export default Component.extend({
   gist: null,
 
   /**
+   * Gist filename to retrieve
+   *
+   * @property filename
+   * @type String | null
+   * @default null
+   */
+  filename: null,
+
+  /**
    * Ajax service
    *
    * @private
@@ -102,13 +111,20 @@ export default Component.extend({
       });
 
       if (gistURL) {
+        const request = { dataType: 'jsonp' };
+        const filename = this.get('filename');
+
+        if (filename) {
+          request.data = { file: filename };
+        }
+
         return this
           .get('gistyAjax')
-          .request(gistURL, { dataType: 'jsonp' })
+          .request(gistURL, request)
           .then(
             (response) => {
               if (this.processMarkup(response)) {
-                // rpocess stylesheet
+                // process stylesheet
               }
             },
             () => {
