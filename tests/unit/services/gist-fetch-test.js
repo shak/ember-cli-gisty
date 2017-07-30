@@ -1,12 +1,14 @@
 import { moduleFor, test } from 'ember-qunit';
 
-moduleFor('service:gist-fetch', 'Unit | Service | gist fetch', {
-  // Specify the other units that are required for this test.
-  // needs: ['service:foo']
-});
+moduleFor('service:gist-fetch', 'Unit | Service | gist fetch');
 
-// Replace this with your real tests.
-test('it exists', function(assert) {
-  let service = this.subject();
-  assert.ok(service);
+test('it has the host set correctly', function(assert) {
+  assert.expect(1);
+
+  const service = this.subject();
+
+  assert.equal(
+    service.get('host'),
+    'https://gist.github.com'
+  );
 });
