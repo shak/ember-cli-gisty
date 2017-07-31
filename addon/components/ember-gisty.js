@@ -116,7 +116,7 @@ export default Component.extend({
       linkTag.type = 'text/css';
       linkTag.rel = 'stylesheet';
       linkTag.href = response.stylesheet;
-      head.insertBefore(linkTag, head.firstChild);
+      head.appendChild(linkTag);
     }
   },
 
