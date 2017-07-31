@@ -75,15 +75,15 @@ Will retrieve and render a particular file from a Gist when specified.
 
 ## Advance Usage
 
-Gisty yields `error` and `isLoading` component states to allow you to show loading spinners or custom error messages in your templates.
+Gisty yields `isError` and `isLoading` component states to allow you to show loading spinners or custom error messages in your templates.
 
-#### `error` (Boolean)
+#### `isError` (Boolean)
 
 True when there is an error loading Gist.
 
 ```hbs
 {{#ember-gisty gist="ca8aa7061ab4fd6b70492e8eaf19addb" as |gisty|}}
-  {{#if gisty.error}}
+  {{#if gisty.isError}}
     <p>There was an error loading Gist</p>
   {{/if}}
 {{/ember-gisty}}
@@ -107,7 +107,7 @@ Exposes action to retrieve Gist from Github, useful if you wish you to retry fet
 
 ```hbs
 {{#ember-gisty gist="ca8aa7061ab4fd6b70492e8eaf19addb" as |gisty|}}
-  {{#if gisty.error}}
+  {{#if gisty.isError}}
     <p>There was an error loading Gist</p>
     <button {{action gisty.fetch}}>Click here to try again.</button>
   {{/if}}
