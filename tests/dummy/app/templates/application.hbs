@@ -1,22 +1,19 @@
-<h2 id="title">Welcome to Ember</h2>
-
-{{#ember-gisty user="shahrukhomar" gist="b4601431db22efbe1376bb768a5c4dae" filename="template.hbs" as |gisty|}}
-  {{#if gisty.isLoading}}
-    <p>... Loading</p>
-  {{/if}}
-  {{#if gisty.error}}
-    <p>there was an error loading gist</p>
-    <button {{action gisty.fetch}}>Try Again</button>
-  {{/if}}
-{{/ember-gisty}}
-{{#ember-gisty user="shahrukhomar" gist="b4601431db22efbe1376bb768a5c4dae" as |gisty|}}
-  {{#if gisty.isLoading}}
-    <p>... Loading</p>
-  {{/if}}
-  {{#if gisty.error}}
-    <p>there was an error loading gist</p>
-    <button {{action gisty.fetch}}>Try Again</button>
-  {{/if}}
-{{/ember-gisty}}
-
-{{outlet}}
+<header>
+  <h1 class="content--align-center"><a rel="noopener" target="_blank" href="https://github.com/shak/ember-cli-kalendae">Ember CLI Gisty</a></h1>
+  <h5 class="content--align-center">Ember CLI add-on for displaying Github Gists</h5>
+  <p class="social">
+    <a class="no-line" href="https://github.com/shak" rel="noopener" target="_blank"><img alt="github logo"src="assets/img/github.png"/> @shak</a> &nbsp;&nbsp;
+    <a class="no-line" href="https://twitter.com/shahrukhomar" rel="noopener" target="_blank"><img alt="twitter logo" src="assets/img/twitter.png"/> @shahrukhomar</a>
+  </p>
+</header>
+<nav>
+  <div class="btn--group">
+    {{#link-to "examples.simple" class="btn btn--color-default"}}Simple Usage{{/link-to}}
+    {{#link-to "examples.advance" class="btn btn--color-default"}}Advance Usage{{/link-to}}
+  </div>
+</nav>
+<content class="row row--align-center">
+  <div class="grid-10">
+    {{outlet}}
+  </div>
+</content>
