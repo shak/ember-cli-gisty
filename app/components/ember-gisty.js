@@ -1,0 +1,1 @@
+export { default } from 'ember-cli-gisty/components/ember-gisty';
