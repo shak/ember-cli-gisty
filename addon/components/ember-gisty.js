@@ -93,7 +93,7 @@ export default Component.extend({
       return true;
     }
 
-    this.set('error', true);
+    this.set('isError', true);
 
     return false;
   },
@@ -130,7 +130,7 @@ export default Component.extend({
       const gistURL = this.get('gistURL');
       // reset state
       this.setProperties({
-        error: false,
+        isError: false,
         isLoading: true
       });
 
@@ -152,7 +152,7 @@ export default Component.extend({
               }
             },
             () => {
-              this.set('error', true);
+              this.set('isError', true);
             }
           )
           .finally(
@@ -162,7 +162,7 @@ export default Component.extend({
           )
         ;
       }
-      this.set('error', true);
+      this.set('isError', true);
     }
   }
 });

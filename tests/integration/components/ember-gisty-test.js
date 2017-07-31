@@ -18,7 +18,7 @@ test('it yields error as true if gist not provided', function(assert) {
 
   this.render(hbs`
     {{#ember-gisty as |gisty|}}
-      {{#if gisty.error}}
+      {{#if gisty.isError}}
         <p id="error">There was an error loading gist</p>
       {{/if}}
     {{/ember-gisty}}
@@ -164,7 +164,7 @@ test('it yields error when request fails', function(assert) {
 
   this.render(hbs`
     {{#ember-gisty user=user gist=gist as |gisty|}}
-      {{#if gisty.error}}
+      {{#if gisty.isError}}
         <p id="error">error state</p>
       {{/if}}
     {{/ember-gisty}}
@@ -191,7 +191,7 @@ test('it yields error when response does not have the div property', function(as
 
   this.render(hbs`
     {{#ember-gisty user=user gist=gist as |gisty|}}
-      {{#if gisty.error}}
+      {{#if gisty.isError}}
         <p id="error">error state</p>
       {{/if}}
     {{/ember-gisty}}
