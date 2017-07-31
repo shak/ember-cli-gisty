@@ -98,6 +98,28 @@ export default Component.extend({
     return false;
   },
 
+  /**
+   * Inserts stylesheet into the head when it is set
+   *
+   * @private
+   * @method processMarkup
+   *
+   * @return Boolean
+   */
+  processStylesheet(response) {
+    const stylesheetHref = getWithDefault(response || {}, 'stylesheet', false);
+
+    if (stylesheetHref) {
+      const linkTag = document.createElement('link');
+      const head = document.getElementsByTagName('head')[0];
+
+      linkTag.type = 'text/css';
+      linkTag.rel = 'stylesheet';
+      linkTag.href = response.stylesheet;
+      head.insertBefore(linkTag, head.firstChild);
+    }
+  },
+
   actions: {
     /**
      * Fetches the gist from the web
@@ -126,7 +148,7 @@ export default Component.extend({
           .then(
             (response) => {
               if (this.processMarkup(response)) {
-                // process stylesheet
+                this.processStylesheet(response);
               }
             },
             () => {

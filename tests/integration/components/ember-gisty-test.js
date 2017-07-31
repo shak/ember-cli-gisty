@@ -249,7 +249,7 @@ test('it inserts the stylesheet when set with div', function(assert) {
     .then(
       () => {
         assert.equal(
-          this.$('link[href="stub"]').length,
+          this.$().parents('html').find('head').find('link[href="stub"]').length,
           1
         );
       }
