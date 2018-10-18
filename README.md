@@ -1,4 +1,4 @@
-# ember-cli-gisty 
+# ember-cli-gisty
 
 [![Build Status](https://travis-ci.org/shak/ember-cli-gisty.svg?branch=master)](https://travis-ci.org/shak/ember-cli-gisty)
 
@@ -51,7 +51,7 @@ For retrieving a particular file from a Gist:
 
 #### `gist` (required)
 
-The hash for the Gist. 
+The hash for the Gist.
 
 ```hbs
 {{ember-gisty gist="ca8aa7061ab4fd6b70492e8eaf19addb"}}
@@ -117,4 +117,3 @@ Exposes action to retrieve Gist from Github, useful if you wish you to retry fet
 ## License
 
 ember-cli-gisty is released under an MIT license and is freely distributable.
-
