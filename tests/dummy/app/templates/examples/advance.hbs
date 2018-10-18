@@ -1,7 +1,17 @@
 <h2>Advance Usage</h2>
 <p>Gisty yields <code>isError</code> and <code>isLoading</code> properties that can be used to display error and loading states</p>
 <p>For Example</p>
-{{ember-gisty user="shak" gist="49b9c01e5e7521f5a96e2679c39d5335"}}
+<EmberGisty
+  @user="shak"
+  @gist="49b9c01e5e7521f5a96e2679c39d5335" as |gisty|
+>
+  {{#if gisty.isLoading}}
+    <p>Loading</p>
+  {{/if}}
+</EmberGisty>
 
 <p>To allow users to re-try fetching the Gist, Gisty also yields <code>fetch</code> action that can be invoked from a button</p>
-{{ember-gisty user="shak" gist="b98198c308aa330d65afe5d12420a370"}}
+<EmberGisty
+  @user="shak"
+  @gist="b98198c308aa330d65afe5d12420a370"
+/>

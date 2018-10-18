@@ -1,11 +1,12 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { typeOf } from '@ember/utils';
-import { inject } from '@ember/service';
+import { notEmpty } from '@ember/object/computed';
 import { getWithDefault } from '@ember/object';
-import jQuery from 'jquery';
 
 import layout from '../templates/components/ember-gisty';
+
+const GIST_BASE_URL = 'https://gist.github.com';
 
 export default Component.extend({
   layout,
@@ -37,13 +38,13 @@ export default Component.extend({
   filename: null,
 
   /**
-   * Ajax service
+   * True if there is a filename to retrieve
    *
-   * @private
-   * @property gistyAjax
-   * @type Ember.Service
+   * @property hasRequestedFilename
+   * @type String | null
+   * @default null
    */
-  gistyAjax: inject(),
+  hasRequestedFilename: notEmpty('filename'),
 
   /**
    * Returns the fill json gistURL for retrieving the GIST
@@ -55,10 +56,15 @@ export default Component.extend({
   gistURL: computed('user', 'gist', {
     get() {
       const gist = this.get('gist');
-      const user = this.get('user');
 
       if (typeOf(gist) === 'string') {
-        return `${user}/${gist}.json`;
+        const url = `${GIST_BASE_URL}/${this.get('user')}/${gist}.json`;
+
+        if (this.get('hasRequestedFilename')) {
+          return `${url}?file=${this.get('filename')}`;
+        }
+
+        return url;
       }
 
       return false;
@@ -87,8 +93,9 @@ export default Component.extend({
     const responseDiv = getWithDefault(response || {}, 'div', false);
 
     if (responseDiv) {
-      const $responseDiv = jQuery(responseDiv);
-      this.$().append($responseDiv);
+      this.element.innerHTML = responseDiv;
+      this.processStylesheet(response);
+      this.set('isLoading', false);
 
       return true;
     }
@@ -128,41 +135,29 @@ export default Component.extend({
      */
     fetch() {
       const gistURL = this.get('gistURL');
-      // reset state
       this.setProperties({
         isError: false,
         isLoading: true
       });
 
       if (gistURL) {
-        const request = { dataType: 'jsonp' };
-        const filename = this.get('filename');
+        const script = document.createElement('script');
+        const callbackName = 'ember_gisty_cb_' + Math.round(100000 * Math.random());
+        window[callbackName] = (response) => {
+          delete window[callbackName];
+          document.body.removeChild(script);
+          this.processMarkup(response);
+        };
 
-        if (filename) {
-          request.data = { file: filename };
+        script.src = `${gistURL}${gistURL.indexOf('?') >= 0 ? '&' : '?'}callback=${callbackName}`;
+        script.type = 'application/javascript';
+
+        script.onerror = () => {
+          this.set('isError', true);
         }
 
-        return this
-          .get('gistyAjax')
-          .request(gistURL, request)
-          .then(
-            (response) => {
-              if (this.processMarkup(response)) {
-                this.processStylesheet(response);
-              }
-            },
-            () => {
-              this.set('isError', true);
-            }
-          )
-          .finally(
-            () => {
-              this.set('isLoading', false);
-            }
-          )
-        ;
+        document.body.appendChild(script);
       }
-      this.set('isError', true);
     }
   }
 });

@@ -1,4 +1,1 @@
-{{#if gistStylesheet}}
-  <link rel="stylesheet" type="text/css" href={{gistStylesheet}}>
-{{/if}}
 {{yield (hash isError=isError isLoading=isLoading fetch=(action "fetch"))}}
