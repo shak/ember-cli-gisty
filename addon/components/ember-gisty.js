@@ -93,7 +93,10 @@ export default Component.extend({
     const responseDiv = getWithDefault(response || {}, 'div', false);
 
     if (responseDiv) {
-      this.element.innerHTML = responseDiv;
+      const gist = document.createElement('div');
+      gist.innerHTML = responseDiv;
+      this.element.appendChild(gist.firstChild);
+
       this.processStylesheet(response);
 
       return true;
@@ -138,9 +141,9 @@ export default Component.extend({
       const script = document.createElement('script');
 
       window[callback] = (response) => {
-        delete window[callback];
-        document.body.removeChild(script);
-        resolve(response);
+          delete window[callback];
+          document.body.removeChild(script);
+          resolve(response);
       };
 
       script.src = `${url}${url.indexOf('?') >= 0 ? '&' : '?'}callback=${callback}`;
