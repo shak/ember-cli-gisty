@@ -135,6 +135,7 @@ export default Component.extend({
      */
     fetch() {
       const gistURL = this.get('gistURL');
+
       this.setProperties({
         isError: false,
         isLoading: true
@@ -156,8 +157,10 @@ export default Component.extend({
           this.set('isError', true);
         }
 
-        document.body.appendChild(script);
+        return document.body.appendChild(script);
       }
+
+      this.set('isError', true);
     }
   }
 });
