@@ -1,20 +1,20 @@
 <h2>Simple Usage</h2>
 <p>Provide <code>user</code> (optional) and <code>gist</code> (hash) to load any gist into the current template.</p>
 <p>For example:</p>
-<EmberGisty
-  @user="shak"
-  @gist="7ddc748fc665709932c843a4820bc05d"
-/>
+{{ember-gisty
+  user="shak"
+  gist="7ddc748fc665709932c843a4820bc05d"
+}}
 
 <p>For particular file, pass the <code>filename</code> param:</p>
-<EmberGisty
-  @user="shak"
-  @gist="4ca16aff5385fb7bad279e30b0e52c1b"
-  @filename="template.hbs"
-/>
+{{ember-gisty
+  user="shak"
+  gist="4ca16aff5385fb7bad279e30b0e52c1b"
+  filename="template.hbs"
+}}
 
 <p>For anonymous Gists:</p>
-<EmberGisty
-  @user="shak"
-  @gist="5abe33d14f5a3baae1bca38c40e79284"
-/>
+{{ember-gisty
+  user="shak"
+  gist="5abe33d14f5a3baae1bca38c40e79284"
+}}
