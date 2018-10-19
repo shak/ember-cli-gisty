@@ -1,11 +1,12 @@
 import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { typeOf } from '@ember/utils';
-import { inject } from '@ember/service';
+import { notEmpty } from '@ember/object/computed';
 import { getWithDefault } from '@ember/object';
-import jQuery from 'jquery';
-
+import RSVP from 'rsvp';
 import layout from '../templates/components/ember-gisty';
+
+export const GIST_BASE_URL = 'https://gist.github.com';
 
 export default Component.extend({
   layout,
@@ -37,13 +38,13 @@ export default Component.extend({
   filename: null,
 
   /**
-   * Ajax service
+   * True if there is a filename to retrieve
    *
-   * @private
-   * @property gistyAjax
-   * @type Ember.Service
+   * @property hasRequestedFilename
+   * @type String | null
+   * @default null
    */
-  gistyAjax: inject(),
+  hasRequestedFilename: notEmpty('filename'),
 
   /**
    * Returns the fill json gistURL for retrieving the GIST
@@ -55,10 +56,15 @@ export default Component.extend({
   gistURL: computed('user', 'gist', {
     get() {
       const gist = this.get('gist');
-      const user = this.get('user');
 
       if (typeOf(gist) === 'string') {
-        return `${user}/${gist}.json`;
+        const url = `${GIST_BASE_URL}/${this.get('user')}/${gist}.json`;
+
+        if (this.get('hasRequestedFilename')) {
+          return `${url}?file=${this.get('filename')}`;
+        }
+
+        return url;
       }
 
       return false;
@@ -87,8 +93,8 @@ export default Component.extend({
     const responseDiv = getWithDefault(response || {}, 'div', false);
 
     if (responseDiv) {
-      const $responseDiv = jQuery(responseDiv);
-      this.$().append($responseDiv);
+      this.element.innerHTML = responseDiv;
+      this.processStylesheet(response);
 
       return true;
     }
@@ -120,6 +126,34 @@ export default Component.extend({
     }
   },
 
+  /**
+   * Fetches gist from the github and sets the jsonp callback
+   * @private
+   * @method fetchGist
+   * @param {String} url
+   * @param {String} callback
+   */
+  fetchGist(url, callback) {
+    return new RSVP.Promise((resolve, reject) => {
+      const script = document.createElement('script');
+
+      window[callback] = (response) => {
+        delete window[callback];
+        document.body.removeChild(script);
+        resolve(response);
+      };
+
+      script.src = `${url}${url.indexOf('?') >= 0 ? '&' : '?'}callback=${callback}`;
+      script.type = 'application/javascript';
+
+      script.onerror = () => {
+        reject();
+      }
+
+      document.body.appendChild(script);
+    });
+  },
+
   actions: {
     /**
      * Fetches the gist from the web
@@ -127,42 +161,35 @@ export default Component.extend({
      * @method action.fetch
      */
     fetch() {
-      const gistURL = this.get('gistURL');
-      // reset state
       this.setProperties({
         isError: false,
         isLoading: true
       });
 
-      if (gistURL) {
-        const request = { dataType: 'jsonp' };
-        const filename = this.get('filename');
+      const gistURL = this.get('gistURL');
 
-        if (filename) {
-          request.data = { file: filename };
-        }
+      if (gistURL === false) {
+        this.set('isError', true);
 
-        return this
-          .get('gistyAjax')
-          .request(gistURL, request)
-          .then(
-            (response) => {
-              if (this.processMarkup(response)) {
-                this.processStylesheet(response);
-              }
-            },
-            () => {
-              this.set('isError', true);
-            }
-          )
-          .finally(
-            () => {
-              this.set('isLoading', false);
-            }
-          )
-        ;
+        return false;
       }
-      this.set('isError', true);
+
+      if (gistURL) {
+        const callbackName = `ember_gisty_cb_${Math.round(100000 * Math.random())}`;
+
+        return this.fetchGist(gistURL, callbackName).then(
+          (response) => {
+            this.processMarkup(response);
+          },
+          ()=> {
+            this.set('isError', true);
+          }
+        ).finally(
+          () => {
+            this.set('isLoading', false);
+          }
+        );
+      }
     }
   }
 });

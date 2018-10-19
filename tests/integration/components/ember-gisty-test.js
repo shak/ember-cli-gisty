@@ -1,285 +1,273 @@
-import { moduleForComponent, test } from 'ember-qunit';
+import { module, test } from 'qunit';
+import { setupRenderingTest } from 'ember-qunit';
+import { render, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import Service from '@ember/service';
-import wait from 'ember-test-helpers/wait';
-
 import RSVP from 'rsvp';
+import { next } from '@ember/runloop';
 
-moduleForComponent('ember-gisty', 'Integration | Component | ember gisty', {
-  integration: true,
-  beforeEach() {
-    this.register('service:gist-ajax', Service.extend());
-    this.inject.service('gisty-ajax', { as: 'gistyAjaxService' });
-  }
-});
+import { GIST_BASE_URL } from 'ember-cli-gisty/components/ember-gisty';
 
-test('it yields error as true if gist not provided', function(assert) {
-  assert.expect(1);
+module('Integration | Component | ember gisty', function(hooks) {
+  setupRenderingTest(hooks);
 
-  this.render(hbs`
-    {{#ember-gisty as |gisty|}}
-      {{#if gisty.isError}}
-        <p id="error">There was an error loading gist</p>
-      {{/if}}
-    {{/ember-gisty}}
-  `);
+  test('it yields error as true if gist not provided', async function(assert) {
+    assert.expect(1);
 
-  assert.equal(
-    this.$('#error').length,
-    1
-  );
-});
+    await render(hbs`
+      {{#ember-gisty as |gisty|}}
+        {{#if gisty.isError}}
+          <p id="error">There was an error loading gist</p>
+        {{/if}}
+      {{/ember-gisty}}
+    `);
 
-test('it requests gist from the correct URL when no user name is provided', function(assert) {
-  assert.expect(1);
-
-  const gist = '1234567789';
-
-  this.set('gistyAjaxService.request', (url) => {
-    assert.equal(
-      url,
-      `anonymous/${gist}.json`
-    );
-
-    return new RSVP.Promise((resolve) => { resolve(); });
+    assert.dom('#error').exists({ count: 1 });
   });
 
-  this.set('gist', gist);
+  test('it requests gist from the correct URL when no user name is provided', async function(assert) {
+    assert.expect(1);
 
-  this.render(hbs`{{ember-gisty gist=gist}}`);
+    const gist = '1234567789';
 
-  return wait();
-});
-
-test('it requests gist from the correct URL when user name is provided', function(assert) {
-  assert.expect(1);
-
-  const gist = '1234567789';
-  const user = 'shahrukhomar';
-
-  this.set('gistyAjaxService.request', (url) => {
-    assert.equal(
-      url,
-      `${user}/${gist}.json`
-    );
-
-    return new RSVP.Promise((resolve) => { resolve(); });
-  });
-
-  this.set('gist', gist);
-  this.set('user', user);
-
-  this.render(hbs`{{ember-gisty user=user gist=gist}}`);
-
-  return wait();
-});
-
-test('it sets the dataType to jsonp always', function(assert) {
-  assert.expect(1);
-
-  const gist = '1234567789';
-  const user = 'shahrukhomar';
-
-  this.set('gistyAjaxService.request', (url, options) => {
-    assert.equal(
-      options.dataType,
-      'jsonp'
-    );
-
-    return new RSVP.Promise((resolve) => { resolve(); });
-  });
-
-  this.set('gist', gist);
-  this.set('user', user);
-
-  this.render(hbs`{{ember-gisty user=user gist=gist}}`);
-
-  return wait();
-});
-
-test('it sets the file query param when particular file is required', function(assert) {
-  assert.expect(1);
-
-  const gist = '1234567789';
-  const user = 'shahrukhomar';
-  const filename = 'test.js';
-
-  this.set('gistyAjaxService.request', (url, options) => {
-    assert.deepEqual(
-      options.data,
-      { file: filename }
-    );
-
-    return new RSVP.Promise((resolve) => { resolve(); });
-  });
-
-  this.set('gist', gist);
-  this.set('user', user);
-  this.set('filename', filename);
-
-  this.render(hbs`{{ember-gisty user=user gist=gist filename=filename}}`);
-
-  return wait();
-});
-
-test('it yields isLoading when request is being processed', function(assert) {
-  assert.expect(1);
-
-  const gist = '1234567789';
-  const user = 'shahrukhomar';
-
-  this.set('gistyAjaxService.request', () => {
-    return new RSVP.Promise(() => { }); // unresolved promise
-  });
-
-  this.set('gist', gist);
-  this.set('user', user);
-
-  this.render(hbs`
-    {{#ember-gisty user=user gist=gist as |gisty|}}
-      {{#if gisty.isLoading}}
-        <p id="isLoading">Loading state</p>
-      {{/if}}
-    {{/ember-gisty}}
-  `);
-
-  assert.equal(
-    this.$('#isLoading').length,
-    1
-  );
-});
-
-test('it yields error when request fails', function(assert) {
-  assert.expect(1);
-
-  const gist = '1234567789';
-  const user = 'shahrukhomar';
-
-  this.set('gistyAjaxService.request', () => {
-    return new RSVP.Promise((resolve, reject) => { reject(); });
-  });
-
-  this.set('gist', gist);
-  this.set('user', user);
-
-  this.render(hbs`
-    {{#ember-gisty user=user gist=gist as |gisty|}}
-      {{#if gisty.isError}}
-        <p id="error">error state</p>
-      {{/if}}
-    {{/ember-gisty}}
-  `);
-
-  assert.equal(
-    this.$('#error').length,
-    1
-  );
-});
-
-test('it yields error when response does not have the div property', function(assert) {
-  assert.expect(1);
-
-  const gist = '1234567789';
-  const user = 'shahrukhomar';
-
-  this.set('gistyAjaxService.request', () => {
-    return new RSVP.Promise((resolve) => { resolve({}); });
-  });
-
-  this.set('gist', gist);
-  this.set('user', user);
-
-  this.render(hbs`
-    {{#ember-gisty user=user gist=gist as |gisty|}}
-      {{#if gisty.isError}}
-        <p id="error">error state</p>
-      {{/if}}
-    {{/ember-gisty}}
-  `);
-
-  assert.equal(
-    this.$('#error').length,
-    1
-  );
-});
-
-test('it renders the markup when returned successfully', function(assert) {
-  assert.expect(1);
-
-  const gist = '1234567789';
-  const user = 'shahrukhomar';
-
-  this.set('gistyAjaxService.request', () => {
-    return new RSVP.Promise((resolve) => { resolve({ div: '<div id="success">Success</div>' }); });
-  });
-
-  this.set('gist', gist);
-  this.set('user', user);
-
-  this.render(hbs`{{ember-gisty user=user gist=gist}}`);
-
-  return wait()
-    .then(
-      () => {
-        assert.equal(
-          this.$('#success').length,
-          1
+    this.setProperties({
+      gist,
+      fetchGist: (url) => {
+        assert.strictEqual(
+          url,
+          `${GIST_BASE_URL}/anonymous/${gist}.json`
         );
+
+        return new RSVP.Promise((resolve) => {
+          resolve();
+        });
       }
-    )
-  ;
-});
+    });
 
-test('it inserts the stylesheet when set with div', function(assert) {
-  assert.expect(1);
+    await render(hbs`{{ember-gisty gist=gist fetchGist=fetchGist}}`);
 
-  const gist = '1234567789';
-  const user = 'shahrukhomar';
-
-  this.set('gistyAjaxService.request', () => {
-    return new RSVP.Promise((resolve) => { resolve({ div: '<div></div>', stylesheet: 'stub' }); });
+    return settled();
   });
 
-  this.set('gist', gist);
-  this.set('user', user);
+  test('it requests gist from the correct URL when user name is provided', async function(assert) {
+    assert.expect(1);
 
-  this.render(hbs`{{ember-gisty user=user gist=gist}}`);
+    const gist = '1234567789';
+    const user = 'shahrukhomar';
 
-  return wait()
-    .then(
-      () => {
-        assert.equal(
-          this.$().parents('html').find('head').find('link[href="stub"]').length,
-          1
+    assert.expect(1);
+
+    this.setProperties({
+      gist,
+      user,
+      fetchGist: (url) => {
+        assert.strictEqual(
+          url,
+          `${GIST_BASE_URL}/${user}/${gist}.json`
         );
+
+        return new RSVP.Promise((resolve) => {
+          resolve();
+        });
       }
-    )
-  ;
-});
+    });
 
-test('it does not insert the stylesheet when there is no div set', function(assert) {
-  assert.expect(1);
+    await render(hbs`{{ember-gisty gist=gist user=user fetchGist=fetchGist}}`);
 
-  const gist = '1234567789';
-  const user = 'shahrukhomar';
-
-  this.set('gistyAjaxService.request', () => {
-    return new RSVP.Promise((resolve) => { resolve({ stylesheet: 'stub' }); });
+    return settled();
   });
 
-  this.set('gist', gist);
-  this.set('user', user);
+  test('it sets the file query param when particular file is required', async function(assert) {
+    assert.expect(1);
 
-  this.render(hbs`{{ember-gisty user=user gist=gist}}`);
+    const gist = '1234567789';
+    const user = 'shahrukhomar';
+    const filename = 'test.js';
 
-  return wait()
-    .then(
-      () => {
-        assert.equal(
-          this.$('link[href="stub"]').length,
-          0
+    assert.expect(1);
+
+    this.setProperties({
+      gist,
+      user,
+      filename,
+      fetchGist: (url) => {
+        assert.strictEqual(
+          url,
+          `${GIST_BASE_URL}/${user}/${gist}.json?file=${filename}`
         );
+
+        return new RSVP.Promise((resolve) => {
+          resolve();
+        });
       }
-    )
-  ;
+    });
+
+    await render(hbs`{{ember-gisty gist=gist user=user filename=filename fetchGist=fetchGist}}`);
+
+    return settled();
+  });
+
+  test('it yields isLoading when request is being processed', async function(assert) {
+    assert.expect(1);
+
+    const gist = '1234567789';
+
+    this.setProperties({
+      gist,
+      fetchGist: () => {
+        return new RSVP.Promise(() => {});
+      }
+    });
+
+    await render(hbs`
+      {{#ember-gisty gist=gist fetchGist=fetchGist as |gisty|}}
+        {{#if gisty.isLoading}}
+          <p id="isLoading">Loading state</p>
+        {{/if}}
+      {{/ember-gisty}}
+    `);
+
+    await assert.dom('#isLoading').exists({ count: 1 });
+
+    return settled();
+  });
+
+  test('it yields error when request fails', async function(assert) {
+    assert.expect(1);
+
+    const gist = '1234567789';
+
+    this.setProperties({
+      gist,
+      fetchGist: () => {
+        return new RSVP.Promise((resolve, reject) => {
+          next(() => { reject(); });
+        });
+      }
+    });
+
+    await render(hbs`
+      {{#ember-gisty gist=gist fetchGist=fetchGist as |gisty|}}
+        {{#if gisty.isError}}
+          <p id="error">error state</p>
+        {{/if}}
+      {{/ember-gisty}}
+    `);
+
+    assert.dom('#error').exists({ count: 1 });
+
+    return settled();
+  });
+
+  test('it yields error when response does not have the div property', async function(assert) {
+    assert.expect(1);
+
+    const gist = '1234567789';
+
+    this.setProperties({
+      gist,
+      fetchGist: () => {
+        return new RSVP.Promise((resolve) => {
+          resolve();
+        });
+      }
+    });
+
+    await render(hbs`
+      {{#ember-gisty gist=gist fetchGist=fetchGist as |gisty|}}
+        {{#if gisty.isError}}
+          <p id="error">error state</p>
+        {{/if}}
+      {{/ember-gisty}}
+    `);
+
+    assert.dom('#error').exists({ count: 1 });
+  });
+
+  test('it renders the markup when returned successfully', async function(assert) {
+    assert.expect(1);
+
+    const gist = '1234567789';
+
+    this.setProperties({
+      gist,
+      fetchGist: () => {
+        return new RSVP.Promise((resolve) => {
+          resolve({ div: '<div id="success">Success</div>' });
+        });
+      }
+    });
+
+    await render(hbs`{{ember-gisty fetchGist=fetchGist gist=gist}}`);
+
+    return settled()
+      .then(
+        () => {
+          assert.dom('#success').exists({ count: 1 });
+        }
+      );
+  });
+
+  test('it inserts the stylesheet when set with div', async function(assert) {
+    assert.expect(1);
+
+    const gist = '1234567789';
+
+    this.setProperties({
+      gist,
+      fetchGist: () => {
+        return new RSVP.Promise((resolve) => {
+          resolve({ div: '<div></div>', stylesheet: 'stub' });
+        });
+      }
+    });
+
+    await render(hbs`{{ember-gisty fetchGist=fetchGist gist=gist}}`);
+    return settled()
+      .then(
+        () => {
+          const links = document.getElementsByTagName('link');
+          for (let link in links) {
+            if (links[link].getAttribute) {
+              if (links[link].getAttribute('href') === 'stub') {
+                assert.ok(true);
+                // remove extra stylsheet
+                document.head.removeChild(links[link]);
+              }
+            }
+          }
+        }
+      )
+    ;
+  });
+
+  test('it does not insert the stylesheet when there is no div set', async function(assert) {
+    assert.expect(0);
+
+    const gist = '1234567789';
+
+    this.setProperties({
+      gist,
+      fetchGist: () => {
+        return new RSVP.Promise((resolve) => {
+          resolve({ stylesheet: 'stub' });
+        });
+      }
+    });
+
+    await render(hbs`{{ember-gisty fetchGist=fetchGist gist=gist}}`);
+
+    return settled()
+      .then(
+        () => {
+          const links = document.getElementsByTagName('link');
+          for (let link in links) {
+            if (links[link].getAttribute) {
+              if (links[link].getAttribute('href') === 'stub') {
+                assert.ok(false);
+              }
+            }
+          }
+        }
+      );
+  });
 });
