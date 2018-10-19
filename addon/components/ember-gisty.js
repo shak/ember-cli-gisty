@@ -3,10 +3,10 @@ import { computed } from '@ember/object';
 import { typeOf } from '@ember/utils';
 import { notEmpty } from '@ember/object/computed';
 import { getWithDefault } from '@ember/object';
-
+import RSVP from 'rsvp';
 import layout from '../templates/components/ember-gisty';
 
-const GIST_BASE_URL = 'https://gist.github.com';
+export const GIST_BASE_URL = 'https://gist.github.com';
 
 export default Component.extend({
   layout,
@@ -95,7 +95,6 @@ export default Component.extend({
     if (responseDiv) {
       this.element.innerHTML = responseDiv;
       this.processStylesheet(response);
-      this.set('isLoading', false);
 
       return true;
     }
@@ -127,6 +126,34 @@ export default Component.extend({
     }
   },
 
+  /**
+   * Fetches gist from the github and sets the jsonp callback
+   * @private
+   * @method fetchGist
+   * @param {String} url
+   * @param {String} callback
+   */
+  fetchGist(url, callback) {
+    return new RSVP.Promise((resolve, reject) => {
+      const script = document.createElement('script');
+
+      window[callback] = (response) => {
+        delete window[callback];
+        document.body.removeChild(script);
+        resolve(response);
+      };
+
+      script.src = `${url}${url.indexOf('?') >= 0 ? '&' : '?'}callback=${callback}`;
+      script.type = 'application/javascript';
+
+      script.onerror = () => {
+        reject();
+      }
+
+      document.body.appendChild(script);
+    });
+  },
+
   actions: {
     /**
      * Fetches the gist from the web
@@ -134,33 +161,35 @@ export default Component.extend({
      * @method action.fetch
      */
     fetch() {
-      const gistURL = this.get('gistURL');
-
       this.setProperties({
         isError: false,
         isLoading: true
       });
 
-      if (gistURL) {
-        const script = document.createElement('script');
-        const callbackName = 'ember_gisty_cb_' + Math.round(100000 * Math.random());
-        window[callbackName] = (response) => {
-          delete window[callbackName];
-          document.body.removeChild(script);
-          this.processMarkup(response);
-        };
+      const gistURL = this.get('gistURL');
 
-        script.src = `${gistURL}${gistURL.indexOf('?') >= 0 ? '&' : '?'}callback=${callbackName}`;
-        script.type = 'application/javascript';
+      if (gistURL === false) {
+        this.set('isError', true);
 
-        script.onerror = () => {
-          this.set('isError', true);
-        }
-
-        return document.body.appendChild(script);
+        return false;
       }
 
-      this.set('isError', true);
+      if (gistURL) {
+        const callbackName = `ember_gisty_cb_${Math.round(100000 * Math.random())}`;
+
+        return this.fetchGist(gistURL, callbackName).then(
+          (response) => {
+            this.processMarkup(response);
+          },
+          ()=> {
+            this.set('isError', true);
+          }
+        ).finally(
+          () => {
+            this.set('isLoading', false);
+          }
+        );
+      }
     }
   }
 });
