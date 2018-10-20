@@ -1,19 +1,19 @@
 {
-  "short_name": "CLIGisty",
+  "short_name": "Gisty",
   "name": "Ember CLI Gisty",
-  "description": "Ember CLI add-on for inserting Github Gists",
+  "description": "Ember CLI add-on for inserting Github Gists by Shahrukh Omar",
   "display": "standalone",
   "start_url": ".",
   "background_color": "#f7f6f3",
   "theme_color": "#e73c7d",
   "icons": [
     {
-      "src": "/assets/img/moose.png",
+      "src": "/ember-cli-gisty/assets/img/moose.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/assets/img/moose_512.png",
+      "src": "/ember-cli-gisty/assets/img/moose_512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
