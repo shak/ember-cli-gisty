@@ -1,0 +1,13 @@
+(function(){"use strict"
+function e(e,t){return!!t.find(function(t){return t.test(decodeURI(e))})}self.CACHE_BUSTER="1540049785862|0.8015735945831377",self.addEventListener("install",function(e){return self.skipWaiting()}),self.addEventListener("activate",function(e){return self.clients.claim()})
+var t=["assets/dummy-a02ec1a2b6e39c5bcc265333719f5996.css","assets/dummy-f06c441cf17e01c39bac93efd6eee69b.js","assets/img/github-406b6b3955e715be69532ab37f4eab7c.png","assets/img/moose_512.png","assets/img/moose.png","assets/img/twitter-0159a270af61a8d3aa269956db6787b7.png","assets/vendor-d41d8cd98f00b204e9800998ecf8427e.css","assets/vendor-b33e5865c2d22f21c69417cf15dbeaa8.js"],n=function(e,t){return caches.keys().then(function(n){n.forEach(function(n){var c=0===n.indexOf(e),s=n!==t
+c&&s&&caches.delete(n)})})},c="".concat("esw-asset-cache","-").concat("1"),s=t.map(function(e){return new URL(e,self.location).toString()}),i=function(){caches.open(c).then(function(e){return e.keys().then(function(t){t.forEach(function(t){-1===s.indexOf(t.url)&&e.delete(t)})})})}
+self.addEventListener("install",function(e){e.waitUntil(caches.open(c).then(function(e){return Promise.all(s.map(function(t){var n=new Request(t,{mode:"cors"})
+return fetch(n).then(function(n){if(n.status>=400){var c=new Error("Request for ".concat(t," failed with status ").concat(n.statusText))
+throw c}return e.put(t,n)}).catch(function(e){console.error("Not caching ".concat(t," due to ").concat(e))})}))}))}),self.addEventListener("activate",function(e){e.waitUntil(Promise.all([n("esw-asset-cache",c),i()]))}),self.addEventListener("fetch",function(e){var t="GET"===e.request.method,n=-1!==s.indexOf(e.request.url)
+t&&n&&e.respondWith(caches.match(e.request,{cacheName:c}).then(function(t){return t||fetch(e.request.url,{mode:"cors"})}))})
+var a=[],r=[]
+self.INDEX_FILE_HASH="1fa7ad7a6a7c55e10dbf35e7da371c8b"
+var o="".concat("esw-index","-").concat("1"),u=new URL("index.html",self.location).toString()
+self.addEventListener("install",function(e){e.waitUntil(fetch(u,{credentials:"include"}).then(function(e){return caches.open(o).then(function(t){return t.put(u,e)})}))}),self.addEventListener("activate",function(e){e.waitUntil(n("esw-index",o))}),self.addEventListener("fetch",function(t){var n=t.request,c=new URL(n.url),s="GET"===n.method,i=-1!==n.headers.get("accept").indexOf("text/html"),f=c.origin===location.origin,l=e(n.url,a),d=!r.length||e(n.url,r)
+!("/tests"===c.pathname&&!1)&&s&&i&&f&&d&&!l&&t.respondWith(caches.match(u,{cacheName:o}).then(function(e){return e||fetch(u,{credentials:"include"}).then(function(e){return caches.open(o).then(function(t){return t.put(u,e)}),e.clone()})}))})})()
