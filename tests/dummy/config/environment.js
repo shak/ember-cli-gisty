@@ -44,7 +44,7 @@ module.exports = function(environment) {
   }
 
   if (environment === 'production') {
-    ENV.locationType = 'none';
+    ENV.locationType = 'hash'; // keep it hash, github pages don't like it otherwise
     ENV.rootURL = '/ember-cli-gisty/';
   }
 
