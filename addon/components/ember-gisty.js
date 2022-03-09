@@ -2,7 +2,7 @@ import Component from '@ember/component';
 import { computed } from '@ember/object';
 import { typeOf } from '@ember/utils';
 import { notEmpty } from '@ember/object/computed';
-import { getWithDefault } from '@ember/object';
+import { get } from '@ember/object';
 import RSVP from 'rsvp';
 import layout from '../templates/components/ember-gisty';
 
@@ -90,7 +90,10 @@ export default Component.extend({
    * @return Boolean
    */
   processMarkup(response) {
-    const responseDiv = getWithDefault(response || {}, 'div', false);
+    let responseDiv =  get(response || {},'div')
+    if (responseDiv === undefined) {
+      responseDiv = false;
+    }
 
     if (responseDiv) {
       const gist = document.createElement('div');
@@ -116,8 +119,11 @@ export default Component.extend({
    * @return Boolean
    */
   processStylesheet(response) {
-    const stylesheetHref = getWithDefault(response || {}, 'stylesheet', false);
-
+    let stylesheetHref = get(response || {},'stylesheet')
+    if (stylesheetHref === undefined) {
+      stylesheetHref = false;
+    }
+    
     if (stylesheetHref) {
       const linkTag = document.createElement('link');
       const head = document.getElementsByTagName('head')[0];
